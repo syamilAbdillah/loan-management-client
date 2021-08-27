@@ -1,0 +1,14 @@
+.dashboard{
+	position: relative;
+	display: flex;
+	min-height: 100vh;
+}
+
+.dashboard-main{
+	width: 100%;
+	overflow-x: hidden;
+}
+
+.dashboard-main > main {
+	margin-top: 3.5rem;
+}

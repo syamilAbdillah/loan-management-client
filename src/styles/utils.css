@@ -1,0 +1,14 @@
+.all-center {
+	display:flex;
+	justify-content: center;
+	align-items:center;
+}
+
+.flex-column{
+	flex-direction: column;
+}
+
+.fullfill-screen {
+	height: 100vh;
+	width: 100vw;
+}
