@@ -1,9 +1,19 @@
-import React from 'react'
+import React, {useState} from 'react'
+import AddButton from '../../share/AddButton'
+import DebtorModal from '../../components/modals/DebtorModal'
 
 export default function Debtors(props){
+	const [isModalActive, setIsModalActive] = useState(false) 
+	const openModal = () => setIsModalActive(true)
+	const closeModal = () => setIsModalActive(false)
+
 	return (
-		<h1 className="is-title is-1">
-			Debtors
-		</h1>
+		<>
+			{isModalActive && <DebtorModal closeModal={closeModal} />}
+			<AddButton
+				text="add new debtor"
+				onClick={openModal}
+			/>
+		</>
 	)
 }

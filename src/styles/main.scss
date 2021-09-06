@@ -18,14 +18,6 @@ $primary: $purple;
 
 
 // Import only what you need from Bulma
-@import "../../node_modules/bulma/sass/utilities/_all.sass";
-@import "../../node_modules/bulma/sass/base/_all.sass";
-@import "../../node_modules/bulma/sass/elements/button.sass";
-@import "../../node_modules/bulma/sass/elements/container.sass";
-@import "../../node_modules/bulma/sass/elements/title.sass";
-@import "../../node_modules/bulma/sass/components/card.sass";
-@import "../../node_modules/bulma/sass/components/tabs.sass";
-@import "../../node_modules/bulma/sass/form/_all.sass";
-@import "../../node_modules/bulma/sass/helpers/spacing.sass";
-@import "../../node_modules/bulma/sass/helpers/color.sass";
+@import "../../node_modules/bulma/bulma.sass";
+
 

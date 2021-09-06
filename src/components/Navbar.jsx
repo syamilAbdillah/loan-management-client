@@ -32,9 +32,12 @@ export function LogoutButton(){
 
 export default function Navbar(props){
 	return (
-		<nav className="navbar px-4">
-			<Hamburger/>
-			<LogoutButton/>
+		<nav className="navbar is-fixed-top" role="navigation" aria-label="dropdown navigation">
+			<div className="navbar-brand">
+				<a className="navbar-item">
+					<Hamburger/>
+				</a>
+			</div>
 		</nav>
 	)
 }

@@ -24,9 +24,6 @@ export default function Dashboard(props){
 	return (
 		<SidebarToggleProvider>
 			<DashboardLayout>
-				<span className="icon has-text-primary is-large">
-            	<i className="fas fa-fish fa-2x"></i>
-         	</span>
 	         <Switch>
 	         	<ProtectedRoute exact path="/" component={HomeDashboard}/>
 	         	<ProtectedRoute path="/creditors" component={Creditors}/>

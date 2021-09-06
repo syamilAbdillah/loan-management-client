@@ -1,18 +1,18 @@
 import React from 'react'
 
-function BaseInput(props){
+function BaseInput({label, inputType, name, value, handleChange, isError, errorMsg, register, schema}){
 	return (
 		<div className="field">
-			<label className="label is-small">{ props.label }</label>
+			<label className="label is-small">{ label }</label>
 			<div className="control">
 				<input 
-					type={ props.inputType || 'text'} 
-					className="input"
-					name={props.name}
-					value={props.value} 
-					onChange={props.handleChange} 
+					type={ inputType || 'text'} 
+					className={isError ? "input is-danger":"input"}
+					name={name}
+					value={value} 
+					{...register(name, {...schema})}
 				/>
-				<p className="help">{ props.desc }</p>
+				{isError && <p className="help">{ errorMsg || "something wrong with this field"}</p>}
 			</div>
 		</div>
 	)
