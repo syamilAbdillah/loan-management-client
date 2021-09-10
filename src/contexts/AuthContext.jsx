@@ -7,11 +7,12 @@ export const useAuth = () => useContext(AuthContext)
 export default function AuthProvider({children}){
 	const [authData, setAuthData] = useState({accessToken: null})
 
-	const setAuthCredential = (email, password) => {
+	const setAuthCredential = (email, password, callback = () => null) => {
 		// normaly we fetch to auth endpoint to get an access token 
 
 		// this is a fake token
-		setAuthData({accessToken: "highly secure token... hehehe"}) 
+		setAuthData({accessToken: "highly secure token... hehehe"})
+		callback() 
 	}
 
 	const destroyAuthCredential = () => setAuthData({accessToken: null})
@@ -25,7 +26,11 @@ export default function AuthProvider({children}){
 	useEffect(() => {
 		localStorage.setItem('accessToken', authData.accessToken)
 		
-		if(!authData.accessToken){
+		const isAuthExist = !authData.accessToken || 
+									authData.accessToken == 'undefined' || 
+									authData.accessToken == 'null' 
+
+		if(isAuthExist){
 			localStorage.removeItem('accessToken')
 		}
 

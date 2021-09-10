@@ -2,7 +2,7 @@ import React, {useState} from 'react'
 import {useForm} from 'react-hook-form'
 import BaseModal from '../../share/BaseModal'
 import BaseInput from '../../share/BaseInput'
-
+ 
 
 
 export default function DebtorModal(props){

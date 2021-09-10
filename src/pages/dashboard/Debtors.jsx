@@ -1,6 +1,7 @@
 import React, {useState} from 'react'
 import AddButton from '../../share/AddButton'
 import DebtorModal from '../../components/modals/DebtorModal'
+import DebtorTable from '../../components/tables/DebtorTable'
 
 export default function Debtors(props){
 	const [isModalActive, setIsModalActive] = useState(false) 
@@ -14,6 +15,7 @@ export default function Debtors(props){
 				text="add new debtor"
 				onClick={openModal}
 			/>
+			<DebtorTable/>
 		</>
 	)
 }

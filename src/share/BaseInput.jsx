@@ -1,6 +1,7 @@
 import React from 'react'
 
 function BaseInput({label, inputType, name, value, handleChange, isError, errorMsg, register, schema}){
+	console.log(isError, errorMsg)
 	return (
 		<div className="field">
 			<label className="label is-small">{ label }</label>
@@ -9,10 +10,9 @@ function BaseInput({label, inputType, name, value, handleChange, isError, errorM
 					type={ inputType || 'text'} 
 					className={isError ? "input is-danger":"input"}
 					name={name}
-					value={value} 
-					{...register(name, {...schema})}
+					{...register(name, schema)}
 				/>
-				{isError && <p className="help">{ errorMsg || "something wrong with this field"}</p>}
+				{isError && <p className="help is-danger">{ errorMsg || "something wrong with this field"}</p>}
 			</div>
 		</div>
 	)

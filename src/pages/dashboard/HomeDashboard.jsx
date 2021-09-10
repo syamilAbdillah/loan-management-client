@@ -43,6 +43,7 @@ export default function HomeDashboard(props){
 			fffffffffffffffffffffffffffff
 			Home Dashboard
 			aalfskdfjlsakdjflaskdjflsakdfljaskdffffffffffffffffffffffffffffffff
+			{import.meta.env.MODE}
 		</h1>
 	)
 }
