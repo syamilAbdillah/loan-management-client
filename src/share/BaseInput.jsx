@@ -1,7 +1,6 @@
 import React from 'react'
 
 function BaseInput({label, inputType, name, value, handleChange, isError, errorMsg, register, schema}){
-	console.log(isError, errorMsg)
 	return (
 		<div className="field">
 			<label className="label is-small">{ label }</label>

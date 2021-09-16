@@ -1,10 +1,12 @@
 import React from 'react'
+import '../styles/hidden-modal.css'
 
 function BaseModal(props){
 	return (
 		<div className="modal is-active">
 			<div className="modal-background"></div>
-			<div className="modal-card">
+			{props.isLoading && <div className="loader"></div>}
+			<div className={`modal-card ${props.isLoading ? 'is-hidden': ''}`}>
 				<header className="modal-card-head">
 					<p className="modal-card-title">{props.title || 'modal'}</p>
 	      		<button className="delete" aria-label="close" onClick={props.closeModal} ></button>

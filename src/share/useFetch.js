@@ -6,12 +6,11 @@ function useFetch(url, initialOpt = {},skip = false, callbacks = {}){
 	const [hasError, setHasError] = useState(false)
 	const [errorMessage, setErrorMessage] = useState()
 
-	function manualFetch(body = {}){
+	function manualFetch(body = {}, localCB = {}){
 		const jsonBody = JSON.stringify(body)
 		setIsLoading(true)
-		const newOpt = Object.assign({}, initialOpt, {body: jsonBody})
+		const newOpt = initialOpt.method == 'GET' || initialOpt == 'DELETE' ? initialOpt : Object.assign({}, initialOpt, {body: jsonBody})
 
-		console.log('newOpt', newOpt)
 		fetch(url, newOpt)
 			.then(resp => {
 				console.log('resp logger',resp)
@@ -21,18 +20,24 @@ function useFetch(url, initialOpt = {},skip = false, callbacks = {}){
 			})
 			.then(data => {
 				setData(data)
-				callbacks?.onSuccess()
+				callbacks.onSuccess && callbacks.onSuccess()
+				localCB.onSuccess && localCB.onSuccess()
 			})
 			.catch(error => {
 				setHasError(true)
 				setErrorMessage(error.message)
-				console.log('error logger', {error})
+				callbacks.onError && callbacks.onError()
+				localCB.onError && localCB.onError()
 			})
-			.finally(() => setIsLoading(false))
+			.finally(() => {
+				setIsLoading(false)
+				callbacks.onFinish && callbacks.onFinish()
+				localCB.onFinish && localCB.onFinish()
+			})
 	}
 
 	useEffect(() => {
-		if(!skip) manualFetch()
+		if(!skip) manualFetch({})
 	}, [])
 
 	//logger 
@@ -45,7 +50,8 @@ function useFetch(url, initialOpt = {},skip = false, callbacks = {}){
 		isLoading, 
 		hasError,
 		errorMessage, 
-		manualFetch
+		manualFetch,
+		setData
 	}
 }
 

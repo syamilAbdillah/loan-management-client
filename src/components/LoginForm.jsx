@@ -5,10 +5,11 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import {useHistory} from 'react-router-dom'
 import BaseInput from '../share/BaseInput'
 import {useAuth} from '../contexts/AuthContext'
+import useFetch from '../share/useFetch'
 
 const schema = yup.object().shape({
-	email: yup.string().email().required(),
-	password: yup.string().required()
+	email: yup.string().trim().email().required(),
+	password: yup.string().trim().required()
 })
 
 export default function LoginForm(props){
@@ -21,11 +22,7 @@ export default function LoginForm(props){
 	console.log(history)
 
 	const handleLogin = ({email, password}) => {
-		auth.setAuthCredential(email, password, (error) => {
-			if(error){
-				history.push('/')
-			}
-		})
+		auth.setAuthCredential(email, password)
 	}
 
 	return(
