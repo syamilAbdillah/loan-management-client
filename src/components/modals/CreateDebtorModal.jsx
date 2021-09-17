@@ -4,11 +4,13 @@ import BaseModal from '../../share/BaseModal'
 import BaseInput from '../../share/BaseInput'
 import {useAuth}from '../../contexts/AuthContext' 
 import useFetch from '../../share/useFetch'
+import {useNotification} from '../../contexts/NotificationContext'
 
 const URL = `${import.meta.env.VITE_BASEURL}/debtor`
 
 export default function CreateDebtorModal(props){
 	const auth = useAuth()
+	const {showNotif} = useNotification()
 	const initialOpt = {
 		method: 'POST',
 		headers: {
@@ -17,7 +19,9 @@ export default function CreateDebtorModal(props){
 		}
 	}
 	const fetcher = useFetch(URL, initialOpt, true, {
-		onFinish: () => props.closeModal()
+		onFinish: () => props.closeModal(),
+		onSuccess: () => showNotif('success create new debtor'),
+		onError: () => showNotif('fail create new debtor', 'danger')
 	})
 	const {register, handleSubmit, formState: {errors}} = useForm()
 	const onSubmit = (data) => {
