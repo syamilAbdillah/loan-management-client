@@ -1,0 +1,14 @@
+.notification-wrapper{
+	position: fixed;
+	top: -4rem;
+	right: 2rem;
+	z-index: 30;
+	transition: transform 350ms ease-in, opacity 150ms ease-out;
+	width: 20rem;
+	opacity: 0;
+}
+
+.notification-wrapper.is-active{
+	transform: translateY(8rem);
+	opacity: 1;
+}
