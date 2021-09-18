@@ -1,9 +1,12 @@
 import React from 'react'
+import CreditTable from '../../components/tables/CreditTable'
+import AddButton from '../../share/AddButton'
 
 export default function Credits(props){
 	return (
-		<h1 className="is-title is-1">
-			Credits
-		</h1>
+		<>
+			<AddButton text="add new credit"/>
+			<CreditTable/>
+		</>
 	)
 }
