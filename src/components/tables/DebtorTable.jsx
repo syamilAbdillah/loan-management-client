@@ -19,18 +19,20 @@ export default function DebtorTable({debtors, openEditModal, handleDeleteDebtor}
 					<td>{debtor.name}</td>
 					<td>{debtor.remaining}</td>
 					<td>
-						<EditButton 
-							onClick={
-								() => openEditModal(debtor.id)
-							} 
-							variant="small" 
-						/>
-						<DeleteButton
-							onClick={
-								() => handleDeleteDebtor(debtor.id)
-							} 
-							variant="small" 
-						/>
+						<span className="buttons">
+							<EditButton 
+								onClick={
+									() => openEditModal(debtor.id)
+								} 
+								variant="small" 
+							/>
+							<DeleteButton
+								onClick={
+									() => handleDeleteDebtor(debtor.id)
+								} 
+								variant="small" 
+							/>
+						</span>
 					</td>
 				</tr>
 			)

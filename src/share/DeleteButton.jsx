@@ -1,10 +1,15 @@
 import React from 'react'
 
-export default function AddButton({text, variant,...rest}){
-	const baseClassName = "button mx-2 is-danger"
+export default function AddButton({text, variant, isLoading ,...rest}){
+	const baseClassName = "button is-danger"
 	const className = !variant ? baseClassName: `${baseClassName} is-${variant}`
+	const classNameWithLoadingState = isLoading ? `${className} is-loading`: className 
 	return (
-		<button className={className} {...rest}>
+		<button 
+			className={classNameWithLoadingState} 
+			disabled={isLoading} 
+			{...rest}
+		>
 			<span className="icon is-small">
 				<i className="fas fa-trash-alt"></i>
 			</span>

@@ -1,27 +1,23 @@
 import React from 'react'
 
-function BaseSelect(props){
+function BaseSelect({ label, options, name, register, schema, errorMsg, isError }){
 	return (
 		<div className="field">
-			<label className="label is-small">{ props.label }</label>
+			<label className="label is-small">{ label }</label>
 			<div className="control">
-				<div className="select">
-					<select 
-						name={props.name} 
-						value={props.value}
-						onChange={props.handleChange}
-					>
-						<option value={null}  hidden>-- please select --</option>
+				<div className={options ? 'select': 'select is-loading'}>
+					<select {...register(name, schema)}>
 						{
-							props.options.map((option, index) => (
-								<option value={option.value} key={index}>
+							options && 
+							options.map((option, index) => (
+								<option value={option.id} key={option.id}>
 									{ option.name }
 								</option>
 							))
 						}
 					</select>
 				</div>
-				<p className="help">{ props.desc }</p>
+				{isError && <p className="help is-danger">{ errorMsg }</p>}
 			</div>
 		</div>
 	)

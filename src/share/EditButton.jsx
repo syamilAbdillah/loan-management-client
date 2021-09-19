@@ -1,7 +1,7 @@
 import React from 'react'
 
 export default function EditButton({text, variant,...rest}){
-	const baseClassName = "button mx-2 is-warning"
+	const baseClassName = "button is-warning"
 	const className = !variant ? baseClassName: `${baseClassName} is-${variant}`
 	return (
 		<button className={className} {...rest}>
