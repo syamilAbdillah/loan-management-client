@@ -42,6 +42,14 @@ export default function AuthProvider({children}){
 		return `Bearer ${auth.accessToken}`
 	}
 
+	const getAuthenticateHeader = (method) => ({
+		method,
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': getBearer()
+		}
+	})
+
 	const destroyAuthCredential = () => setAuthData(INITIAL_AUTH_CREDENTIAL)
 
 	useEffect(() => {
@@ -85,7 +93,8 @@ export default function AuthProvider({children}){
 				authData, 
 				setAuthCredential, 
 				destroyAuthCredential,
-				getBearer, 
+				getBearer,
+				getAuthenticateHeader, 
 				isLoading, 
 				hasError, 
 				ErrorMessage 
