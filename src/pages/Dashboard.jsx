@@ -19,6 +19,7 @@ import Creditors from './dashboard/Creditors'
 import Debtors from './dashboard/Debtors'
 import Credits from './dashboard/Credits'
 import Debts from './dashboard/Debts'
+import LoanDetail from './dashboard/LoanDetail'
 
 export default function Dashboard(props){
 	const {children} = props
@@ -34,11 +35,13 @@ export default function Dashboard(props){
 						onClose={closeNotif} 
 					/>
 		         <Switch>
-		         	<ProtectedRoute exact path="/" component={HomeDashboard}/>
 		         	<ProtectedRoute path="/creditors" component={Creditors}/>
 		         	<ProtectedRoute path="/debtors" component={Debtors}/>
+		         	<ProtectedRoute path="/credits/:id" component={LoanDetail}/>
+		         	<ProtectedRoute path="/debts/:id" component={LoanDetail}/>
 		         	<ProtectedRoute path="/credits" component={Credits}/>
 		         	<ProtectedRoute path="/debts" component={Debts}/>
+		         	<ProtectedRoute path="/" component={HomeDashboard}/>
 		         	<Route path="*">
 		         		<Redirect to="/404" />
 		         	</Route>

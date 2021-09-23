@@ -4,6 +4,7 @@ import React from 'react'
 import BaseTable from '../../share/BaseTable'
 import DeleteButton from '../../share/DeleteButton'
 import EditButton from '../../share/EditButton'
+import DetailButton from '../../share/DetailButton'
 import LoadingRows from './LoadingRows'
 
 // utils
@@ -43,6 +44,9 @@ function DebtTableBody({ debts, isLoading, onEdit, onDelete }){
 										variant="small" 
 										onClick={() => onDelete(debt.id)}
 									/>			
+									<DetailButton
+										to={`/debts/${debt.id}`}
+									/>
 								</span>
 							</td>
 						</tr>
