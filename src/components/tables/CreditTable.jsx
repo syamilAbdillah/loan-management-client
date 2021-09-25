@@ -3,18 +3,23 @@ import BaseTable from '../../share/BaseTable'
 import LoadingRows from './LoadingRows'
 import EditButton from '../../share/EditButton'
 import DeleteButton from '../../share/DeleteButton'
+import DetailButton from '../../share/DetailButton'
 import formatDate from '../../utils/formatDate'
 import NumberToRupiah from '../../utils/NumberToRupiah'
 
 export default function CreditTable(props){
 	return (
 		<CreditTableLayout>
-			{ (props.credits && !props.isLoading)? <CreditTableBody {...props} /> : <LoadingRows/> }
+			{ 
+				(props.credits && !props.isLoading)? 
+				<CreditTableBody {...props} /> : 
+				<tbody><LoadingRows/></tbody> 
+			}
 		</CreditTableLayout>
 	)
 }
 
-function CreditTableBody({ credits, onDelete, onEdit, deleteLoading, whileDeleting }){
+function CreditTableBody({ credits }){
 	return credits.map(function(credit, index){
 		return (
 			<tr key={credit.id}>
@@ -25,15 +30,7 @@ function CreditTableBody({ credits, onDelete, onEdit, deleteLoading, whileDeleti
 				<td>{credit.Debtor.name}</td>
 				<td>
 					<span className="buttons">
-						<EditButton 
-							onClick={() => onEdit(credit)} 
-							variant="small" 
-						/>
-						<DeleteButton
-							onClick={() => onDelete(credit.id)}
-							variant="small" 
-							isLoading={whileDeleting == credit.id ? deleteLoading : false}
-						/>						
+						<DetailButton to={`/credit/${credit.id}`}/>						
 					</span>
 				</td>
 			</tr>

@@ -35,7 +35,7 @@ export default function EditDebtModal({closeModal, debt, onSuccess}){
 			date: new Date(data.date),
 			nominal: data.nominal * 1,
 			desc: data.desc,
-			CreditorId: debt.Creditor.id
+			CreditorId: debt.Contact.id
 		})
 
 		const opt = getAuthenticateHeader('PATCH')

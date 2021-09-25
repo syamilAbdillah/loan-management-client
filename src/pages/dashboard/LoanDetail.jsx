@@ -1,8 +1,10 @@
-import React from 'react'
-import { useParams, useLocation } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { useParams, useLocation, useHistory } from 'react-router-dom'
 
 // helper component
 import PaymentTable from '../../components/tables/PaymentTable'
+import EditDebtModal from '../../components/modals/EditDebtModal'
+import EditCreditModal from '../../components/modals/EditCreditModal'
 
 // share component
 import Time from '../../share/Time'
@@ -12,79 +14,132 @@ import AddButton from '../../share/AddButton'
 
 // custom hook
 import useFetch from '../../share/useFetch'
+import useAsync from '../../share/useAsync'
+import { useAuth } from '../../contexts/AuthContext'
+import { useNotification } from '../../contexts/NotificationContext'
 
 // utils
 import NumberToRupiah from '../../utils/NumberToRupiah'
 
 export default function LoanDetail(props){
+	const { showNotif } = useNotification()
+	const location = useLocation()
+	const debtOrCredit = location.pathname.split('/')[1]
+	const { id } = useParams()
+	const history = useHistory()
+	const { getAuthenticateHeader } = useAuth()
+	const url = import.meta.env.VITE_BASEURL + location.pathname
+	const { data: loan, isLoading, manualFetch: reFetch } = useFetch(url, getAuthenticateHeader('GET'))
+	const { callAsync: deleteLoan, isLoading: deleteLoading } = useAsync({
+		onSuccess: function(){
+			history.push(`/${debtOrCredit}`)
+		},
+		onError: function(){
+			showNotif(`failed deleting this ${debtOrCredit}`, 'danger')
+		}
+	})
 	
-	const mock = {
-		name: 'john doe',
-		desc: 'bla bla bla bla',
-		date: new Date(),
-		nominal: 5000
+
+	// is /debt/:id ?
+	const isDebt = debtOrCredit == 'debt'
+	const [isEditLoan, setEditLoan] = useState(false) 
+	function successEditLoan(){
+		setEditLoan(false)
+		showNotif('success edit ' + debtOrCredit)
+		reFetch()
 	}
 
-	const location = useLocation()
-	const params = useParams()
 
-	console.log(location, params)
+	// handle delete
+	function handleDelete(){
+		const isConfirmed = confirm('are you sure ??')
+		if(!isConfirmed) return
+
+
+		deleteLoan(url, getAuthenticateHeader('DELETE'))
+	}
 
 	return (
 		<>
-			<LoanDetailHeader>
-				<LoanDetailCard 
-					name={mock.name}
-					desc={mock.desc}
-					date={mock.date}
-					nominal={mock.nominal}
+			{ 
+				isEditLoan && 
+				isDebt &&
+				<EditDebtModal 
+					debt={{...loan, id} || {}} 
+					onSuccess={successEditLoan}
+					closeModal={() => setEditLoan(false)}
 				/>
-				<LoanCurrency
-					variant="success"
-					title="paid"
-					nominal={4000}
-				/>
-				<LoanCurrency
-					variant="danger"
-					title="remaining"
-					nominal={1000}
-				/>
-			</LoanDetailHeader>
+				
+			}
+			{
+				isEditLoan && 
+				!isDebt &&
+				<EditCreditModal
+					credit={{...loan, id}|| {}}
+					onSuccess={successEditLoan}
+					closeModal={() => setEditLoan(false)}
+				/>  
+			}
+			<LoanDetailHeader 
+				isLoading={isLoading} 
+				loan={loan} 
+				onEdit={() => setEditLoan(true)} 
+				onDelete={handleDelete}
+			/>
 			<AddButton text="create payment" />
-			<PaymentTable/>
+			<PaymentTable payments={loan?.Payments || []} isLoading={isLoading}/>
 		</>
 	)
 }
 
-function LoanDetailHeader({children}){
+function LoanDetailHeader({isLoading, loan, onEdit, onDelete}){
 
-	const isArray = children instanceof Array
+	if(isLoading) return <CardLoading/>;
+	
+	function totalPayments(payments){
 
+		if(!payments) return 0
+
+		return payments.reduce((acc, curr) => acc + curr.nominal, 0)
+	}
+	
 	return (
 		<>
 			<div className="columns">
 				<div className="column">
-					{ isArray ? children[0]: children }
+					<LoanDetailCard 
+						name={loan?.Contact.name}
+						date={loan?.date}
+						desc={loan?.desc}
+						nominal={loan?.nominal}
+						onEdit={onEdit}
+						onDelete={onDelete}
+					/>
 				</div>
 			</div>
-			{
-				isArray && 
-				<div className="columns">
-					<div className="column">
-						{ children[1] }
-					</div>
-					<div className="column">
-						{ children[2] }
-					</div>
+			<div className="columns">
+				<div className="column">
+					<LoanCurrency
+						variant="success"
+						title="paid"
+						nominal={totalPayments(loan?.Payments)}
+					/>
 				</div>
-			}
+				<div className="column">
+					<LoanCurrency
+						variant="danger"
+						title="remaining"
+						nominal={loan?.nominal - totalPayments(loan?.Payments) || 0}
+					/>
+				</div>
+			</div>
 			<hr className="devider"></hr>
 		</>
 	)
 }
 
 
-function LoanDetailCard({name, desc, date, nominal}){
+function LoanDetailCard({name, desc, date, nominal, onEdit, onDelete}){
 	return (
 		<div className="card">
 			<div className="card-content">
@@ -93,16 +148,16 @@ function LoanDetailCard({name, desc, date, nominal}){
 						<div className="content">
 							<h4>{ name }</h4>
 							<p>{ desc }</p>
-							<Time stringDate={date}/>
+							<Time stringDate={date || '2000-01-01'}/>
 						</div>
 					</div>
 					<div className="column is-flex is-flex-direction-column">
 						<h4 className="title is-3">
-							{ NumberToRupiah(nominal) }
+							{ NumberToRupiah(nominal || '0') }
 						</h4>
 						<span className="buttons has-text-right">
-							<EditButton/>
-							<DeleteButton/>
+							<EditButton onClick={onEdit}/>
+							<DeleteButton onClick={onDelete}/>
 						</span>
 					</div>
 				</div>
@@ -110,6 +165,12 @@ function LoanDetailCard({name, desc, date, nominal}){
 		</div>
 	)
 }
+
+const CardLoading = props => (
+	<div className="block box p-6 is-flex is-justify-content-center">
+		<div className="loader my-6"></div>
+	</div>
+)
 
 function LoanCurrency({nominal, variant, title}){
 	const className = variant ? `message is-${variant}`: 'message'

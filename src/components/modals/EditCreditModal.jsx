@@ -8,43 +8,48 @@ import BaseSelect from '../../share/BaseSelect'
 
 // custom hook
 import useFetch from '../../share/useFetch'
+import useAsync from '../../share/useAsync'
+import { useAuth } from '../../contexts/AuthContext'
 import { useNotification } from '../../contexts/NotificationContext'
 
 // utils
 import formatDate from '../../utils/formatDate'
 
-export default function EditCreditModal({closeModal, getInitialOpt, selectedCredit}){
+export default function EditCreditModal({closeModal, onSuccess, credit}){
 	const {showNotif} = useNotification()
-	const url = `${import.meta.env.VITE_BASEURL}/credit/${selectedCredit.id}`
+	const {getAuthenticateHeader} = useAuth()
+	const {register, handleSubmit, reset, formState: {errors}} = useForm()
+
+	const url = `${import.meta.env.VITE_BASEURL}/credit/${credit.id}`
 	const responseCb = {
-		onSuccess: () => showNotif('success edit credit'),
+		onSuccess: () => {
+			onSuccess()
+			showNotif('success edit credit')
+		},
 		onError: () => showNotif('failed edit credit', 'danger'),
 		onFinish: () => closeModal()
 	}
+	const { callAsync, isLoading: creditLoading } = useAsync(responseCb)
 
-	const {
-		manualFetch, 
-		isLoading: creditLoading
-	} = useFetch(url, getInitialOpt('PATCH'), true, responseCb)
-
-	const {register, handleSubmit, reset, formState: {errors}} = useForm()
 
 	function onSubmit(data){
-		const requestBody = {
+		const requestBody = JSON.stringify({
 			date: new Date(data.date),
 			nominal: data.nominal * 1,
 			desc: data.desc,
-			DebtorId: selectedCredit.Debtor.id
-		}
+			DebtorId: credit.Contact.id
+		})
 
-		manualFetch(requestBody)
+		const opt = getAuthenticateHeader('PATCH')
+		opt.body = requestBody
+		callAsync(url ,opt)
 	}
 
 	useEffect(() => {
 		reset({
-			date: formatDate(selectedCredit.date),
-			nominal: selectedCredit.nominal,
-			desc: selectedCredit.desc
+			date: formatDate(credit.date),
+			nominal: credit.nominal,
+			desc: credit.desc
 		})
 	}, [])
 

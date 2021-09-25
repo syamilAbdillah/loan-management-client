@@ -6,7 +6,6 @@ import AddButton from '../../share/AddButton'
 // helper component
 import DebtTable from '../../components/tables/DebtTable'
 import CreateDebtModal from '../../components/modals/CreateDebtModal'
-import EditDebtModal from '../../components/modals/EditDebtModal'
 
 // custom hook
 import { useAuth } from '../../contexts/AuthContext'
@@ -34,61 +33,12 @@ export default function Debts(props){
 		setIsCreateModalActive(true)
 	}
 
-	// handle edit existing debt
-	const [isEditModalActive, setIsEditModalActive] = useState(false)
-	const [selectedDebt, setSelectedDebt] = useState({})
-	function openEditModal(debt){
-		setSelectedDebt(debt)
-		setIsEditModalActive(true)
-	}
-	function closeEditModal(){
-		setSelectedDebt({})
-		setIsEditModalActive(false)
-	}
-
-	// handle delete
-	const [deleteLoading, setDeleteLoading] = useState(false) 
-	const [deletedID, setDeletedID] = useState('')
-
-	function handleDelete(id){
-		const isConfirmed = confirm('are you sure ?')
-		if(!isConfirmed) return
-
-		const opt = getAuthenticateHeader('DELETE')
-		const url = import.meta.env.VITE_BASEURL + '/debt/' + id
-		
-		setDeletedID(id)
-		setDeleteLoading(true)
-
-		fetch(url, opt)
-			.then(resp => {
-				if(resp.status != 200) throw new Error(resp.status)
-				setDebts(debts.filter(debt => debt.id != id))
-				showNotif('success delete debt')
-			})
-			.catch(error => {
-				showNotif('failed delete debt', 'danger')
-			})
-			.finally(() => {
-				setDeleteLoading(false)
-				setDeletedID('')
-			})
-	}
-
 	return (
 		<>
 			{ 
 				isCreateModalActive && 
 				<CreateDebtModal
 					closeModal={closeCreateModal}
-					onSuccess={reFetch}
-				/>
-			}
-			{
-				isEditModalActive && 
-				<EditDebtModal
-					closeModal={closeEditModal}
-					debt={selectedDebt}
 					onSuccess={reFetch}
 				/>
 			}
@@ -99,8 +49,6 @@ export default function Debts(props){
 			<DebtTable 
 				debts={debts} 
 				isLoading={isDebtsLoading}
-				onEdit={openEditModal}
-				onDelete={handleDelete}
 			/>
 		</>
 	)

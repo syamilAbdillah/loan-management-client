@@ -20,7 +20,7 @@ export default function DebtTable(props){
 	)
 }
 
-function DebtTableBody({ debts, isLoading, onEdit, onDelete }){
+function DebtTableBody({ debts, isLoading}){
 	return(
 		<tbody>
 			{ 
@@ -35,17 +35,9 @@ function DebtTableBody({ debts, isLoading, onEdit, onDelete }){
 							<td>{ NumberToRupiah(debt.nominal) }</td>
 							<td>{ debt.Creditor.name }</td>
 							<td>
-								<span className="buttons">
-									<EditButton 
-										variant="small"
-										onClick={() => onEdit(debt)} 
-									/>
-									<DeleteButton 
-										variant="small" 
-										onClick={() => onDelete(debt.id)}
-									/>			
+								<span className="buttons">		
 									<DetailButton
-										to={`/debts/${debt.id}`}
+										to={`/debt/${debt.id}`}
 									/>
 								</span>
 							</td>

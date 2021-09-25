@@ -10,7 +10,16 @@ export default function PaymentTable(props){
 	return (
 		<BaseTable>
 			<PaymentTableHead/>
-			<LoadingRows/>
+			{ 
+				props.isLoading && 
+				<tbody>
+					<LoadingRows/>
+				</tbody>
+			}
+			{
+				!props.isLoading &&
+				<PaymentTableBody payments={props.payments}/>
+			}
 		</BaseTable>
 	)
 }
@@ -31,7 +40,8 @@ function PaymentTableHead(){
 function PaymentTableBody({ payments }){
 	return (
 		<tbody>
-			{ 
+			{	payments.length < 1 ?
+				<tr><td>empty</td></tr>:
 				payments.map((payment, index) => {
 					return (
 						<tr key={payment.id}>
@@ -40,7 +50,8 @@ function PaymentTableBody({ payments }){
 							<td>{NumberToRupiah(payment.nominal)}</td>
 							<td>
 								<span className="buttons">
-									
+									<EditButton variant="small" />
+									<DeleteButton variant="small" />
 								</span>
 							</td>
 						</tr>

@@ -35,13 +35,13 @@ export default function Dashboard(props){
 						onClose={closeNotif} 
 					/>
 		         <Switch>
-		         	<ProtectedRoute path="/creditors" component={Creditors}/>
-		         	<ProtectedRoute path="/debtors" component={Debtors}/>
-		         	<ProtectedRoute path="/credits/:id" component={LoanDetail}/>
-		         	<ProtectedRoute path="/debts/:id" component={LoanDetail}/>
-		         	<ProtectedRoute path="/credits" component={Credits}/>
-		         	<ProtectedRoute path="/debts" component={Debts}/>
-		         	<ProtectedRoute path="/" component={HomeDashboard}/>
+		         	<ProtectedRoute exact path="/" component={HomeDashboard}/>
+		         	<ProtectedRoute path="/creditor" component={Creditors}/>
+		         	<ProtectedRoute path="/debtor" component={Debtors}/>
+		         	<ProtectedRoute path="/credit/:id" component={LoanDetail}/>
+		         	<ProtectedRoute path="/debt/:id" component={LoanDetail}/>
+		         	<ProtectedRoute path="/credit" component={Credits}/>
+		         	<ProtectedRoute path="/debt" component={Debts}/>
 		         	<Route path="*">
 		         		<Redirect to="/404" />
 		         	</Route>

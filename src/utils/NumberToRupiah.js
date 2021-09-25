@@ -1,4 +1,6 @@
 export default function (number){
+	if(number == undefined || number == null) return number
+
 	const [stringNumber, fractional] = number.toString().split('.')
 	const reverseNumber = stringNumber.split('').reverse()
 	

@@ -40,44 +40,6 @@ export default function Credits(props){
 		manualFetch()
 	}
 
-	// edit modal state
-	const [isEditModalActive, setIsEditModalActive] = useState(false)
-	const [selectedCredit, setSelectedCredit] = useState({})
-	function openEditModal(credit){
-		setSelectedCredit(credit)
-		setIsEditModalActive(true)
-	}
-	function closeEditModal(){
-		setIsEditModalActive(false)
-		setSelectedCredit({})
-		manualFetch()
-	}
-
-	// handle delete
-	const [deleteLoading, setDeleteLoading] = useState(false)
-	const [whileDeleting, setWhileDeleting] = useState('')
-	function handleDelete(id){
-		const willDeleteUrl = `${url}/${id}`
-		setWhileDeleting(id)
-		const isConfirmed = confirm(`are you sure want to delete this ?`)
-		console.log(isConfirmed)
-		if(isConfirmed){
-			setDeleteLoading(true)
-			fetch(willDeleteUrl, getInitialOpt('DELETE'))
-				.then(function(resp){
-					if(resp.status != 200) throw new Error('failed delete')
-					showNotif('success delete credit')
-					setCredits(credits.filter(credit => credit.id != id))
-				})
-				.catch(function(error){
-					console.log(error)
-					showNotif('failed delete credit', 'danger')
-				})
-				.finally(() => {
-					setDeleteLoading(false)
-				})
-		} 
-	}
 	return (
 		<>
 			{
@@ -87,22 +49,10 @@ export default function Credits(props){
 					closeModal={closeCreateModal} 
 				/>
 			}
-			{
-				isEditModalActive && 
-				<EditCreditModal 
-					getInitialOpt={getInitialOpt} 
-					closeModal={closeEditModal} 
-					selectedCredit={selectedCredit}
-				/>
-			}
 			<AddButton onClick={openCreateModal} text="add new credit"/>
 			<CreditTable 
 				credits={credits} 
 				isLoading={isLoading}
-				deleteLoading={deleteLoading}
-				whileDeleting={whileDeleting}
-				onDelete={handleDelete} 
-				onEdit={openEditModal} 
 			/>
 		</>
 	)
