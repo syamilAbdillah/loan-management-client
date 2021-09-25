@@ -6,19 +6,19 @@ import EditButton from '../../share/EditButton'
 import DeleteButton from '../../share/DeleteButton'
 import LoadingRows from './LoadingRows'
 
-export default function PaymentTable(props){
+export default function PaymentTable({isLoading, ...rest}){
 	return (
 		<BaseTable>
 			<PaymentTableHead/>
 			{ 
-				props.isLoading && 
+				isLoading && 
 				<tbody>
 					<LoadingRows/>
 				</tbody>
 			}
 			{
-				!props.isLoading &&
-				<PaymentTableBody payments={props.payments}/>
+				!isLoading &&
+				<PaymentTableBody {...rest}/>
 			}
 		</BaseTable>
 	)
@@ -37,10 +37,11 @@ function PaymentTableHead(){
 	)
 }
 
-function PaymentTableBody({ payments }){
+function PaymentTableBody({ payments, onEdit, onDelete, deleteLoading, deleted }){
 	return (
 		<tbody>
-			{	payments.length < 1 ?
+			{	
+				payments.length < 1 ?
 				<tr><td>empty</td></tr>:
 				payments.map((payment, index) => {
 					return (
@@ -50,8 +51,15 @@ function PaymentTableBody({ payments }){
 							<td>{NumberToRupiah(payment.nominal)}</td>
 							<td>
 								<span className="buttons">
-									<EditButton variant="small" />
-									<DeleteButton variant="small" />
+									<EditButton 
+										onClick={() => onEdit(payment)} 
+										variant="small" 
+									/>
+									<DeleteButton 
+										onClick={() => onDelete(payment)}
+										isLoading={payment.id == deleted.id ? deleteLoading : false} 
+										variant="small" 
+									/>
 								</span>
 							</td>
 						</tr>

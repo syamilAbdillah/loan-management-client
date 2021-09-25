@@ -5,6 +5,7 @@ import { useParams, useLocation, useHistory } from 'react-router-dom'
 import PaymentTable from '../../components/tables/PaymentTable'
 import EditDebtModal from '../../components/modals/EditDebtModal'
 import EditCreditModal from '../../components/modals/EditCreditModal'
+import PaymentModal from '../../components/modals/PaymentModal'
 
 // share component
 import Time from '../../share/Time'
@@ -20,6 +21,7 @@ import { useNotification } from '../../contexts/NotificationContext'
 
 // utils
 import NumberToRupiah from '../../utils/NumberToRupiah'
+import deepCopy from '../../utils/deepCopy'
 
 export default function LoanDetail(props){
 	const { showNotif } = useNotification()
@@ -29,7 +31,7 @@ export default function LoanDetail(props){
 	const history = useHistory()
 	const { getAuthenticateHeader } = useAuth()
 	const url = import.meta.env.VITE_BASEURL + location.pathname
-	const { data: loan, isLoading, manualFetch: reFetch } = useFetch(url, getAuthenticateHeader('GET'))
+	const { data: loan, setData: setLoan, isLoading, manualFetch: reFetch } = useFetch(url, getAuthenticateHeader('GET'))
 	const { callAsync: deleteLoan, isLoading: deleteLoading } = useAsync({
 		onSuccess: function(){
 			history.push(`/${debtOrCredit}`)
@@ -59,6 +61,130 @@ export default function LoanDetail(props){
 		deleteLoan(url, getAuthenticateHeader('DELETE'))
 	}
 
+	/**
+	 *	PAYMENT LOGICS
+	 **/
+
+	// CREATE
+	const [isCreatePayment, setIsCreatePayment] = useState(false)
+	const [createPaymentLoading, setCreatePaymentLoading] = useState(false)
+	// open create modal
+	function openCreatePayment(){
+		setIsCreatePayment(true)
+	}
+	// close create modal
+	function closeCreatePayment(){
+		setIsCreatePayment(false)
+	}
+	// handle create 
+	function handleCreatePayment(data){
+		const url = import.meta.env.VITE_BASEURL + '/payment'
+		const opt = getAuthenticateHeader('POST')
+		opt.body = JSON.stringify({...data, LoanId: id})
+		setCreatePaymentLoading(true)
+		fetch(url, opt)
+			.then(resp => {
+				if(resp.status != 200) throw new Error(resp.status)
+
+				return resp.json()
+			})
+			.then(data => {
+				showNotif('success create payment')
+				const loanCopy = deepCopy(loan)
+				loanCopy.Payments.push({
+					id: data.id,
+					date: data.date,
+					nominal: data.nominal
+				})
+				setLoan(loanCopy)
+			})
+			.catch(error => {
+				showNotif('failed create payment', 'danger')
+			})
+			.finally(() => {
+				setCreatePaymentLoading(false)
+				setIsCreatePayment(false)
+			})
+	}
+	
+	// EDIT
+	const [selectedPayment, setSelectedPayment] = useState({})
+	const [isEditPayment, setIsEditPayment] = useState(false) 
+	const [editPaymentLoading, setEditPaymentLoading] = useState(false)
+	// open edit modal
+	function openEditPayment(payment){
+		setSelectedPayment(payment)
+		setIsEditPayment(true)
+	}
+	// close edit modal
+	function closeEditPayment(){
+		setSelectedPayment({})
+		setIsEditPayment(false)
+	}
+	// handle edit
+	function handleEditPayment(data){
+		const url = `${import.meta.env.VITE_BASEURL}/payment/${selectedPayment.id}`
+		const opt = getAuthenticateHeader('PATCH')
+		opt.body = JSON.stringify({...data, LoanId: id})
+		setEditPaymentLoading(true)
+		fetch(url, opt)
+			.then(resp => {
+				if(resp.status != 200) throw new Error(resp.status)
+
+				return resp.json()
+			})
+			.then(_ignoreMe => {
+				showNotif('success edit payment')
+				const loanCopy = deepCopy(loan)
+
+				loanCopy.Payments = loanCopy.Payments.map(payment => {
+					if(payment.id == selectedPayment.id) 
+						return {...payment, ...data, nominal: data.nominal * 1}
+
+					return payment
+				})
+				setLoan(loanCopy)
+			})
+			.catch(error => {
+				showNotif('failed edit payment', 'danger')
+			})
+			.finally(() => {
+				setEditPaymentLoading(false)
+				setIsEditPayment(false)
+				setSelectedPayment({})
+			})
+	}
+	
+	// DELETE
+	// handle delete
+	const [paymentDeleteLoading, setPaymentDeleteLoading] = useState(false)
+	function handleDeletePayment(payment){
+		const isConfirmed = confirm('are you sure ?')
+		if(!isConfirmed) return
+
+		const url = `${import.meta.env.VITE_BASEURL}/payment/${payment.id}`
+		setSelectedPayment(payment)
+		setPaymentDeleteLoading(true)
+		
+		fetch(url, getAuthenticateHeader('DELETE'))
+			.then(resp => {
+				if(resp.status != 200) throw new Error(resp.status)
+				
+				showNotif('success delete payment')
+				setLoan({
+					...loan, 
+					Payments: loan.Payments.filter(el => el.id != payment.id)
+				})
+			})
+			.catch(error => {
+				showNotif('failed delete payment', 'danger')
+			})
+			.finally(() => {
+				setSelectedPayment({})
+				setPaymentDeleteLoading(false)
+			})
+	}
+
 	return (
 		<>
 			{ 
@@ -78,7 +204,28 @@ export default function LoanDetail(props){
 					credit={{...loan, id}|| {}}
 					onSuccess={successEditLoan}
 					closeModal={() => setEditLoan(false)}
+					editPayment={selectedPayment}
 				/>  
+			}
+
+			{
+				!isEditPayment && 
+				isCreatePayment && 
+				<PaymentModal
+					onClose={closeCreatePayment}
+					onSubmit={handleCreatePayment}
+					isLoading={createPaymentLoading}
+				/>
+			}
+			{
+				isEditPayment && 
+				!isCreatePayment && 
+				<PaymentModal
+					onClose={closeEditPayment}
+					onSubmit={handleEditPayment}
+					isLoading={editPaymentLoading}
+					payment={selectedPayment}
+				/>
 			}
 			<LoanDetailHeader 
 				isLoading={isLoading} 
@@ -86,8 +233,15 @@ export default function LoanDetail(props){
 				onEdit={() => setEditLoan(true)} 
 				onDelete={handleDelete}
 			/>
-			<AddButton text="create payment" />
-			<PaymentTable payments={loan?.Payments || []} isLoading={isLoading}/>
+			<AddButton onClick={openCreatePayment} text="create payment" />
+			<PaymentTable 
+				payments={loan?.Payments || []} 
+				isLoading={isLoading}
+				onEdit={openEditPayment}
+				onDelete={handleDeletePayment}
+				deleteLoading={paymentDeleteLoading}
+				deleted={selectedPayment}
+			/>
 		</>
 	)
 }
